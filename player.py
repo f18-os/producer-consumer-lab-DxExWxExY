@@ -16,7 +16,7 @@ class Extract(threading.Thread):
 		success,image = vidcap.read()
 		cq.put(image)
 		print("Reading frame {} {} ".format(count, success))
-		while True:
+		while success:
 			try:
 			 	# write the current frame to the queue
 				success,image = vidcap.read()
@@ -50,6 +50,8 @@ class Convert(threading.Thread):
 				time.sleep(0.001)
 			except Exception as e:
 				print("Killing Convert")
+				cq.put(None)
+				dq.put(None)
 				break	
 # End Convert
 class Display(threading.Thread):
@@ -60,7 +62,7 @@ class Display(threading.Thread):
 		startTime = time.time()
 		# load the frame
 		frame = dq.get()
-		while True:
+		while frame is not None:
 			try:
 				print("Displaying frame {}".format(count))
 				# Display the frame in a window called "Video"
